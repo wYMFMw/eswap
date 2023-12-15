@@ -16,7 +16,7 @@ const clickOption=(option)=>{
             <img src="https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/openai.png"/>
         </slot>
         <slot name="desc">
-            <h3>有什么问题尽管问我！</h3>
+            <h3 class="msg">有什么问题尽管问我！</h3>
         </slot> 
         <slot name="operation">
             <button class="option" v-for="item of optionQs" @click="clickOption(item)">
@@ -27,6 +27,9 @@ const clickOption=(option)=>{
 </template>
 
 <style scoped lang="less">
+.msg{
+    margin:0.6em 0;
+}
 .option{
     width: 80vw;
     height:8vh;

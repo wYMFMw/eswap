@@ -1,24 +1,37 @@
-<script setup>
-import { ref, reactive, onMounted,onUpdated, inject } from "vue";
+<script setup lang="jsx">
+import { ref, reactive, onMounted, onUpdated, inject, watch } from "vue";
 import RemarkItem from "./RemarkItem.vue";
 import { getGptReader, readChunk, readChunk2, myGPT3 } from "@/functions/ai/openai.js";
 import Loading from "./Loading.vue";
 import GPTitem from "./GPTitem.vue";
 import markdownIt from "markdown-it";
 import WhenEmpty from "./WhenEmpty.vue";
+import { notification } from "ant-design-vue"
 import { compressText } from "@/functions/ai/utils";
+import {doAliQuery} from "@/functions/ai/ali";
+// notification.config({
+//     placement:"topLeft"
+// })
 let gptlist = reactive([]);
 let txtarea = ref("");
 let state = reactive({
     isLoading: false,
     isGenerating: false,
-    historyList: []
+    historyList: [],
+    model: "openai"
 })
 
 const addremark = (e) => {
-    if (e.code == "Enter") {
-        clickaddremark();
+    if (state.model == 'openai') {
+        if (e.code == "Enter") {
+            clickaddremark();
+        }
+    }else if(state.model=='bailian'){
+        if (e.code == "Enter") {
+            clickaddremark2();
+        }
     }
+
 }
 const xreadChunk3 = async (query, callback) => {
     let result = "";
@@ -49,6 +62,23 @@ const xreadChunk3 = async (query, callback) => {
 }//实乃下策，因为用参数只能转递第一次的参数，响应式变量变化之后无影响,只能把函数定义在这里使用词法作用域
 
 
+const clickaddremark2 = async (xquestion) => {
+    let question = txtarea.value;
+    let result = "";
+    if (question) {
+        state.isLoading = true;
+        gptlist.push({ content: question, type: 'Q' });
+        localStorage.setItem("gptitem", JSON.stringify(gptlist))
+        question = xquestion ?? question;
+        txtarea.value = "";
+        doAliQuery({query:question}).then(res=>{
+            state.isLoading = false;
+            gptlist.push({ content: res.data, type: 'A' });
+            localStorage.setItem("gptitem", JSON.stringify(gptlist));
+        });
+        
+    }
+}
 const clickaddremark = async (xquestion) => {
     let question = txtarea.value;
     let result = "";
@@ -90,6 +120,12 @@ const delcomment = (content) => {
 onMounted(async () => {
     gptlist.push(...JSON.parse(localStorage.getItem("gptitem")) ?? []);
     initGPTHistory();
+    notification.info({
+        message: "温馨提示",
+        description: <div class="gptNote">
+            <h3>本镜像站尚在测试阶段，免费供大家使用，欢迎大家凭自觉打赏，如果发现bug，请及时联系作者</h3>
+        </div>
+    })
 })
 const initGPTHistory = () => {
     let role = ["user", "assistant"];
@@ -107,6 +143,13 @@ const initGPTHistory = () => {
         }
     })
 }
+const clickGenerate=()=>{
+    if(state.model=='openai'){
+        clickaddremark();
+    }else if(state.model=='bailian'){
+        clickaddremark2();
+    }
+}
 const doOptions = (option) => {
     txtarea.value = option[0];
     clickaddremark(option[1]);
@@ -114,6 +157,11 @@ const doOptions = (option) => {
 const stopGenerate = () => {
     state.isGenerating = false;
 }
+
+const modeOptions=[
+    {label:"基于openAI",value:"openai"},
+    {label:"基于学习资料",value:"bailian"}
+]
 
 </script>
 
@@ -125,11 +173,15 @@ const stopGenerate = () => {
         </div>
 
         <Loading v-show="state.isLoading"></Loading>
+        
         <div class="remarkinput">
             <a-input v-model:value="txtarea" class="txt" @keydown="addremark" size="large" allow-clear
                 placeholder="请输入问题并耐心等待一会">
+                <template #prefix>
+                    <a-select v-model:value="state.model" placeholder="mode" :options="modeOptions" class="selectMode"/>
+                </template>
                 <template #suffix>
-                    <svg t="1700587632741" v-if="!state.isGenerating" @click="clickaddremark()"
+                    <svg t="1700587632741" v-if="!state.isGenerating" @click="clickGenerate"
                         :class="txtarea == '' ? 'icon2' : 'icon1'" viewBox="0 0 1024 1024" version="1.1"
                         xmlns="http://www.w3.org/2000/svg" p-id="13127" width="10" height="10">
                         <path
@@ -146,9 +198,11 @@ const stopGenerate = () => {
                 </template>
             </a-input>
         </div>
+        
     </div>
 </template>
 <style scoped lang="less">
+
 .remarks {
     width: 100%;
     height: 66vh;

@@ -3,9 +3,11 @@ import { defineStore } from 'pinia'
 
 export const useCommodityStore = defineStore('commodity', () => {
   const state=reactive({
-    commodityList:[]
+    commodityList:[],
+    categories:[]
   })
   return {
     commodityList:state.commodityList,
+    categorys:state.categories,
   }
 })

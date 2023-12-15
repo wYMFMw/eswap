@@ -1,16 +1,34 @@
 <script setup>
 import { ScanOutlined, SearchOutlined, BarsOutlined } from "@ant-design/icons-vue"
+import { reactive } from "vue";
+import {useRouter} from "vue-router"
+const router=useRouter()
+const state=reactive({
+    value:""
+})
+const emit=defineEmits(["doSearch"])
+const enterdoSearch=(e)=>{
+    if(e.keyCode===13){
+        doSearch();
+    }
+}
+const doSearch=()=>{
+    emit("doSearch",state.value)
+}
+const goClassify=()=>{
+    router.push("/classify")
+}
 </script>
 
 <template>
     <div class="topSearch">
         <div class="searchbar">
-            <a-input placeholder="双肩包|冬季搭配一整套" size="large">
+            <a-input placeholder="双肩包|冬季搭配一整套" size="large" v-model:value="state.value" @keydown="enterdoSearch">
                 <template #prefix>
                     <ScanOutlined />
                 </template>
                 <template #suffix>
-                    <SearchOutlined />
+                    <SearchOutlined @click="doSearch"/>
                 </template>
             </a-input>
 
@@ -18,7 +36,7 @@ import { ScanOutlined, SearchOutlined, BarsOutlined } from "@ant-design/icons-vu
         <div class="classify">
             <a-button type="link" size="large" class="classsifybtn">
                 <template #icon>
-                    <BarsOutlined />
+                    <BarsOutlined @click="goClassify"/>
                 </template>
             </a-button>
         </div>

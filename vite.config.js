@@ -6,16 +6,18 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base:"./",
   plugins: [
     vue(),
     vueJsx(),
   ],
   server:{
-    port:9897
+    port:9263
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'vue': 'vue/dist/vue.esm-bundler.js'
     }
   }
 })

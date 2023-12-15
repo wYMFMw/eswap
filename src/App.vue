@@ -1,13 +1,20 @@
 <script setup>
-import { onMounted } from "vue"
+import { onMounted, reactive, ref } from "vue"
 import Eswap from "@/components/Eswap.vue";
+import { doFileDownload } from "@/functions/file.js";
+import { doAliQuery } from "./functions/ai/ali";
+
+
 </script>
 
 <template>
-    <Eswap></Eswap>
+    <Eswap/>
+   
 </template>
 
-<style scoped></style>
+<style scoped lang="less">
+
+</style>
 <style>
 * {
     margin: 0;

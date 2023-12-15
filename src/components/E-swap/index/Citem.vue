@@ -15,6 +15,9 @@
     const citemClick=()=>{
         if(props.label=="EGPT"){
             router.push({path:'/campus',query:{activeKey:'3'}});
+        }
+        else if(props.label=='学习资料'){
+            router.push({path:'/campus',query:{activeKey:'2'}});
         }else{
             alert(props.label)
         }

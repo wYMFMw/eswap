@@ -12,6 +12,7 @@ import Login from "@/components/E-swap/my/My/Login.vue";
 import Register from "@/components/E-swap/my/My/Register.vue";
 import Findbackpass from "@/components/E-swap/my/My/Findbackpass.vue";
 import Cart from "@/components/E-swap/index/Cart.vue";
+import Classify from "@/components/E-swap/index/Classify/Classify.vue";
 
 const routes=[
     {path:"/",component:Content,children:[//这里只要嵌套路由，父路由必须是一个只含<RouterView/>的vue组件
@@ -28,6 +29,7 @@ const routes=[
     {path:"/register",component:Register},
     {path:"/findbackpass",component:Findbackpass},
     {path:"/cart",component:Cart},
+    {path:"/classify",component:Classify}
 ]
 
 const router = createRouter({

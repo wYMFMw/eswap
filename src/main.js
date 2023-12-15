@@ -7,6 +7,7 @@ import Vuelazyload from 'vue3-lazyload'
 import 'highlight.js/styles/atom-one-dark.css'
 import 'highlight.js/lib/common'
 import hljsVuePlugin from '@highlightjs/vue-plugin'
+
 const app = createApp(App)
 app.use(Antd)
 app.use(Vuelazyload,{

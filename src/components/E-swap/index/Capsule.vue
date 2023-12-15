@@ -2,6 +2,7 @@
 import { computed } from "vue"
 const props = defineProps(["bgcolor"])
 const bgcolor=computed(()=>props.bgcolor??"#eee")
+
 </script>
 
 <template>

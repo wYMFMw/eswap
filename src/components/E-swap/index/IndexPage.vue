@@ -4,13 +4,20 @@ import IndexTopSearch from "./IndexTopSearch.vue";
 import WheelImgs from "./WheelImgs.vue";
 import Kingkong from "./Kingkong.vue";
 import Capsule from "./Capsule.vue";
-import {useCommodityStore} from "@/stores/useCommodityStore"
+import { CloseOutlined, AimOutlined } from "@ant-design/icons-vue"
+import { useCommodityStore } from "@/stores/useCommodityStore"
 import { doQuery } from "@/functions/mysql"
-import { AimOutlined } from "@ant-design/icons-vue"
+import { useRouter } from "vue-router"
+const router = useRouter()
 const commodityStore = useCommodityStore()
 
 const state = reactive({
-    cimgs: []
+    cimgs: [],
+    xcimgs:[],
+    showTags: false,
+    xtags: ["乒乓球", "台球", "BJD娃娃", "垂钓", "今日降价", "民族乐器", "手风琴", "皮包", "汽车养护", "足球", "跑步装备", "穿搭", "电脑零件", "桌游", "电动车"],
+    plustags: ["香水", "电子琴", "吉他", "健身", "汉服", "阅读", "配饰", "化妆品", "JK制服", "影音", "收纳", "Cosplay"]
+
 })
 const imgs = [
     "https://afly0321.oss-cn-hangzhou.aliyuncs.com/img/w05.png",
@@ -28,36 +35,61 @@ const kkitems = [
     { url: prefix + "dd7.png", label: "EGPT" },
     { url: prefix + "dd8.png", label: "纸飞机" }
 ]
-const hobbyitems = ["高数A", "JAVA", "玄幻", "+"];
+
+
+const hobbyitems = ["拉杆箱", "手机", "牛奶", "+"];
 onMounted(async () => {
-    let p = {};
-    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity limit 1000,50";
-    await doQuery(p).then((res) => {
-        state.cimgs.splice(0);
-        state.cimgs.push(...res.data);
-        commodityStore.commodityList.splice(0);
-        commodityStore.commodityList.push(...res.data);
-    });
+    await getCommoditys();
+    state.xcimgs=state.cimgs;
 })
+const getCommoditys = async () => {
+    let p = {};
+    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity limit 1000,80";
+    await doQuery(p).then((res) => {
+        state.cimgs = [...res.data];
+        commodityStore.commodityList = [...res.data];
+    });
+}
 const getRandomColor = () => {
     let r = Math.floor(Math.random() * 255);
     let g = Math.floor(Math.random() * 255);
     let b = Math.floor(Math.random() * 255);
     return `rgb(${r},${g},${b})`;
 }
+const openTags = (item) => {
+    if (item == "+") {
+        state.showTags = true;
+    }else if(item==""){
+        state.cimgs=state.xcimgs;
+    }else{
+        state.cimgs=state.xcimgs.filter(xitem=>xitem.category==item);
+    }
+}
+const guesslike=()=>{
+    state.cimgs=state.xcimgs;
+}
+const deletexTag=(type,tag)=>{
+    if(type==1){
+        state.xtags=state.xtags.filter(item=>item!=tag);
+    }else if(type==2){
+        state.plustags=state.plustags.filter(item=>item!=tag);
+        state.xtags.push(tag);
+    }
+    
+}
 </script>
 
 <template>
     <div class="indexpage">
-        <IndexTopSearch />
+        <IndexTopSearch @do-search="openTags"/>
         <div class="scrollPart">
             <WheelImgs :imgs="imgs" />
             <Kingkong :items="kkitems" />
             <div class="hobbytab">
-                <Capsule bgcolor="rgb(212, 237, 250)">
+                <Capsule bgcolor="rgb(212, 237, 250)" @click="guesslike">
                     <b>猜你喜欢</b>
                 </Capsule>
-                <Capsule v-for="item of hobbyitems">
+                <Capsule v-for="item of hobbyitems" @click="openTags(item)">
                     {{ item }}
                 </Capsule>
             </div>
@@ -86,17 +118,78 @@ const getRandomColor = () => {
 
             </div>
         </div>
-
-
     </div>
+    <a-drawer title="我的频道" class="tagDrawer" placement="bottom" height="90vh" :open="state.showTags"
+        @close="state.showTags = false">
+        <div class="xtagBody">
+            <div class="xtag" v-for="item of state.xtags" @click="deletexTag(1,item)">
+                {{ item }}
+                <a-divider type="vertical" />
+                <CloseOutlined />
+            </div>
+        </div>
+        <a-tabs>
+            <a-tab-pane key="x1" tab="为您推荐">
+                <div class="plustagBody">
+                    <div class="plustag" v-for="item of state.plustags"  @click="deletexTag(2,item)">
+                        <CloseOutlined class="toplus" />
+                        <a-divider type="vertical" />
+                        {{ item }}
+                    </div>
+                </div>
+
+            </a-tab-pane>
+            <a-tab-pane key="x2" tab="明星周边"></a-tab-pane>
+            <a-tab-pane key="x3" tab="兴趣品类"></a-tab-pane>
+            <a-tab-pane key="x4" tab="经典ip"></a-tab-pane>
+            <a-tab-pane key="x5" tab="品牌"></a-tab-pane>
+        </a-tabs>
+
+
+    </a-drawer>
 </template>
 
 <style scoped lang="less">
-.scrollPart{
-    width:100vw;
-    height:78.2vh;
+
+.xtagBody {
+    display: flex;
+    flex-wrap: wrap;
+    padding:0.2em;
+}
+.plustagBody{
+    .xtagBody();
+}
+.toplus {
+    transform: rotate(45deg);
+}
+
+.xtag {
+    border: 1px solid #c8c7c7;
+    width: 7em;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding: 0.5em;
+    border-radius: 0.6em;
+    margin:0 0.3em 0.8em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+
+.plustag {
+    .xtag();
+    padding-left: 0.7em;
+    justify-content: left;
+}
+
+.scrollPart {
+    width: 100vw;
+    height: 78.2vh;
     overflow-y: scroll;
 }
+
 .location {
     position: relative;
     width: 36vw;
@@ -175,8 +268,8 @@ const getRandomColor = () => {
     text-decoration: none;
 }
 
-.cimg img{
-    width:42vw;
+.cimg img {
+    width: 42vw;
     margin-left: 2vw;
 }
 

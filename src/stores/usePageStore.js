@@ -1,9 +1,11 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-
+import { reactive } from 'vue'
 export const usePageStore = defineStore('pageStore', () => {
-  const pagename = ref("首页")
+  const state = reactive({
+    pagename:"登录页"
+  })
   return {
-    pagename
+    pagename:state.pagename
   }
 })
