@@ -8,6 +8,7 @@ import { CloseOutlined, AimOutlined } from "@ant-design/icons-vue"
 import { useCommodityStore } from "@/stores/useCommodityStore"
 import { doQuery } from "@/functions/mysql"
 import { useRouter } from "vue-router"
+import Location from "./Location.vue";
 const router = useRouter()
 const commodityStore = useCommodityStore()
 
@@ -39,15 +40,21 @@ const kkitems = [
 
 const hobbyitems = ["拉杆箱", "手机", "牛奶", "+"];
 onMounted(async () => {
-    await getCommoditys();
-    state.xcimgs=state.cimgs;
+    
+    if(commodityStore.state.commodityList.length==0){
+        await getCommoditys();
+        state.xcimgs=state.cimgs;
+    }else{
+        state.cimgs=state.xcimgs=commodityStore.state.commodityList;
+    }
+    
 })
 const getCommoditys = async () => {
     let p = {};
-    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity limit 1000,80";
+    p.selectsql = "select id,name,price,image,category,brand,userid,avater from commodity2 order by rowno desc limit 100";
     await doQuery(p).then((res) => {
         state.cimgs = [...res.data];
-        commodityStore.commodityList = [...res.data];
+        commodityStore.state.commodityList = [...res.data];
     });
 }
 const getRandomColor = () => {
@@ -96,23 +103,24 @@ const deletexTag=(type,tag)=>{
             <div class="recommend">
                 <RouterLink class="card" v-for="item of state.cimgs" :to="{ path: 'details', query: { cid: item.id } }">
                     <img class="cimg" v-lazy="item.image" />
-                    <div class="location">
-                        <AimOutlined class="locationicon" />
-                        浙江理工大学生活{{ (1 + Math.random() * 2).toFixed(0) }}区
-                    </div>
+                    <Location width="38vw" fontsize="0.3em" class="location">
+                        <template #address>
+                            浙江理工大学生活{{ (1 + Math.random() * 2).toFixed(0) }}区
+                        </template>
+                        
+                    </Location>
                     <div class="desc">
-                        <a-tag v-if="(item.price / 100) % 2 == 0" color="#2db7f5" class="tag">包邮</a-tag>
+                        <a-tag v-if="(item.price) % 2 == 0" color="#2db7f5" class="tag">包邮</a-tag>
                         <a-tag v-else color="pink" class="tag">自取</a-tag>
                         {{ item.name }}
                     </div>
                     <div class="priceetc">
-                        <span class="price">{{ item.price / 100 }}</span>
+                        <span class="price">{{ item.price }}</span>
                         <span class="wantcount">{{ (Math.random() * 300 + 80).toFixed(0) }}人想要</span>
                     </div>
                     <div class="userinfo">
                         <img class="avater" v-lazy="item.avater" />
                         <span class="userid">{{ item.userid }}</span>
-
                     </div>
                 </RouterLink>
 
@@ -150,7 +158,10 @@ const deletexTag=(type,tag)=>{
 </template>
 
 <style scoped lang="less">
-
+.location{
+    position: relative;
+    top:-3vh;
+}
 .xtagBody {
     display: flex;
     flex-wrap: wrap;
@@ -190,21 +201,6 @@ const deletexTag=(type,tag)=>{
     overflow-y: scroll;
 }
 
-.location {
-    position: relative;
-    width: 36vw;
-    top: -6em;
-    font-size: 0.3em;
-    border-radius: 5px;
-    color: #ffffff;
-    background-color: #575757a9;
-    margin-left: 0.8em;
-    padding: 0.4em 0.2em;
-}
-
-.locationicon {
-    font-size: 2.5em;
-}
 
 .userinfo {
     display: flex;

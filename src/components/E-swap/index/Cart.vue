@@ -97,7 +97,7 @@ const goIndex = () => {
                                 </a-tooltip>
                             </div>
                             <div class="price">
-                                {{ item.price / 100 }}
+                                {{ item.price }}
                             </div>
 
                         </div>

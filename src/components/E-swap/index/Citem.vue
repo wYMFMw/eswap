@@ -18,6 +18,8 @@
         }
         else if(props.label=='学习资料'){
             router.push({path:'/campus',query:{activeKey:'2'}});
+        }else if(props.label=='纸飞机'){
+            router.push("/passriver")
         }else{
             alert(props.label)
         }

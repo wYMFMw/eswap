@@ -8,7 +8,8 @@ export const useUserStore=defineStore("userStore",()=>{
             userid:"",
             username:"",
             password:"",
-            phoneno:""
+            phoneno:"",
+            avater:""
         }
     })
     const goLogin=()=>{

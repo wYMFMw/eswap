@@ -32,7 +32,7 @@ onMounted(() => {
     initCount();
 })
 const filterCommodity = () => {
-    return commodityStore.commodityList.filter(item => item.id == route.query.cid)?.[0];
+    return commodityStore.state.commodityList.filter(item => item.id == route.query.cid)?.[0];
 }
 const goBack = () => {
     router.go(-1);
@@ -94,7 +94,7 @@ const donFocusUser = () => {
             <div class="commodityinfo">
                 <div class="desc">
                     <div class="nums">
-                        <span class="price">{{ state.currentCommodity.price / 100 }}</span>
+                        <span class="price">{{ state.currentCommodity.price }}</span>
                         <span class="count">
                             <span class="count1">{{ (Math.random() * 2500).toFixed(0) }}人想要</span>
                             <a-divider type="vertical" />

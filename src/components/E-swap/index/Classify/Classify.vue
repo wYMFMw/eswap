@@ -3,8 +3,8 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { doQuery, doQueryTree } from "@/functions/mysql";
 import { LeftOutlined, SearchOutlined, PaperClipOutlined } from "@ant-design/icons-vue";
-import {useCommodityStore} from "@/stores/useCommodityStore"
-const commodityStore=useCommodityStore();
+import { useCommodityStore } from "@/stores/useCommodityStore"
+const commodityStore = useCommodityStore();
 const router = useRouter();
 const state = reactive({
     alllevel: [],
@@ -15,10 +15,19 @@ const state = reactive({
     level3: []
 })
 onMounted(async () => {
-    await getLevel1();
-    await initSelectLevel1();
-    await initSelectLevel2();
-    await getAllLevel();    
+    if (commodityStore.state.categories.length == 0) {
+        await getLevel1();
+        await initSelectLevel1();
+        await initSelectLevel2();
+        await getAllLevel();
+        commodityStore.state.categories = state.alllevel;
+    }else{
+        state.alllevel = commodityStore.state.categories;
+        await getLevel1();
+        await initSelectLevel1();
+        await initSelectLevel2();
+    }
+
 })
 const getAllLevel = async () => {
     let p = {};
@@ -28,14 +37,23 @@ const getAllLevel = async () => {
     })
 }
 const getLevel1 = async () => {
-    let p = {};
-    p.sqlprocedure = 'demox0051';
-    await doQuery(p).then(res => {
-        state.level1 = res.data
-    })
+    if (state.alllevel.length > 0) {
+        state.level1 = state.alllevel.filter(item => {
+            if (item.level == 1) {
+                return item;
+            }
+        })
+    } else {
+        let p = {};
+        p.sqlprocedure = 'demox0051';
+        await doQuery(p).then(res => {
+            state.level1 = res.data
+        })
+    }
+
 }
 const getLevel2 = async () => {
-    if (state.alllevel.length != 0) {
+    if (state.alllevel.length > 0) {
         state.level2 = state.alllevel.filter(item => {
             if (item.parentnodeid == state.selectLevel1ID && item.level == 2) {
                 return item;
@@ -67,7 +85,7 @@ const initSelectLevel2 = async () => {
     await selectLevel2()
 }
 const getLevel3 = async () => {
-    if (state.alllevel.length != 0) {
+    if (state.alllevel.length > 0) {
         state.level3 = state.alllevel.filter(item => {
             if (item.parentnodeid == state.selectLevel2ID && item.level == 3) {
                 return item;
@@ -85,7 +103,7 @@ const getLevel3 = async () => {
 watch(() => state.selectLevel2ID, () => {
     selectLevel2();
 })
-const showClass=(name)=>{
+const showClass = (name) => {
     alert(name)
 }
 </script>
@@ -141,7 +159,7 @@ const showClass=(name)=>{
 @topbarGray: #efeeee;
 
 .tabitem {
-    height:68vh;
+    height: 68vh;
     overflow-y: scroll;
 }
 

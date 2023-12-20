@@ -22,7 +22,7 @@ export const useCartStore = defineStore('cart', () => {
     return state.cart.filter(item => item.id == cid).length;
   }
   const sumMoney = computed(() => {
-    const priceList=state.cart.map(item=>item.price/100);
+    const priceList=state.cart.map(item=>item.price);
     return priceList.reduce((sum,cur)=>sum+cur,0);
   })
   return {

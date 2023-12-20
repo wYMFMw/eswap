@@ -7,7 +7,17 @@ const props=defineProps(["name","desc","bgColor"])
 const bgColor=computed(()=>props.bgColor??"#ffedda")
 
 const showmsg=()=>{ 
-    alert(props.name)
+    switch(props.name){
+        case "发闲置":
+            router.push("/sell")
+            break;
+        case "表白墙":
+            router.push("/bbwall")
+            break;
+        case "发求购":
+            router.push("/askbuy")
+            break; 
+    }
 }
 </script>
 
