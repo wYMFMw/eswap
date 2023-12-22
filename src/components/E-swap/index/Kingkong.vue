@@ -12,7 +12,11 @@ const itemwidth=computed(()=>props.itemwidth??"24vw");
     </div>
 </template>
 
-<style scoped>
+<style scoped lang="less">
+@mobile: ~"only screen and (max-width: 767px)";
+@tablet: ~"only screen and (min-width: 768px) and (max-width: 991px)";
+@desktop: ~"only screen and (min-width: 992px)";
+
 .kingkong {
     width: 100%;
     height: 26vh;
@@ -20,6 +24,5 @@ const itemwidth=computed(()=>props.itemwidth??"24vw");
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-
 }
 </style>

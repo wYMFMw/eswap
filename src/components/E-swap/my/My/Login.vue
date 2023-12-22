@@ -2,9 +2,10 @@
 import Background from './Background.vue';
 import { message, Modal } from 'ant-design-vue';
 import { doQuery, doUpdate } from "@/functions/mysql";
-import { reactive, onMounted, nextTick } from 'vue';
+import { reactive, onMounted, nextTick, getCurrentInstance } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { cryptoOut } from "@/functions/crypto.js"
+
 import { useUserStore } from "@/stores/userStore.js"
 const userStore = useUserStore();
 const router = useRouter();
@@ -71,15 +72,17 @@ const doLogin = async () => {
             nextAutoLogin();
         }
         clearLoginForm();
-        userStore.userid = matchone.userid;//修改userStore
-        userStore.username = matchone.username;
-        userStore.password = matchone.password;
-        userStore.phoneno = matchone.phoneno;
+        userStore.userInfo.userid = matchone.userid;//修改userStore
+        userStore.userInfo.username = matchone.username;
+        userStore.userInfo.password = matchone.password;
+        userStore.userInfo.phoneno = matchone.phoneno;
         showLoginResult(matchone);
         router.push("/index")
     }
 }
+const proxy=getCurrentInstance().proxy
 const showLoginResult = (matchone) => {
+    
     if (matchone.userstatus == 'su') {
         message.success("尊贵的的管理员" + matchone.username + "恭喜您登录成功！");
     } else if (matchone.userstatus == 'ssu') {
@@ -87,6 +90,10 @@ const showLoginResult = (matchone) => {
     } else {
         message.success("亲爱的用户" + matchone.username + "恭喜您登录成功！");
     }
+    setTimeout(() => {
+        proxy.$confetti.addConfetti();
+    }, 1000);
+
 }
 const nextAutoLogin = () => {
     localStorage.setItem("loginform", JSON.stringify(state.loginform));
@@ -142,7 +149,7 @@ onMounted(async () => {
                         <a-input allow-clear type="password" v-model:value="state.loginform.password" placeholder="请输入密码" />
                     </a-form-item>
                     <div class="crypto">
-                        <a-form-item label="验证码">
+                        <a-form-item label="验证码" class="crypto-form">
                             <a-input v-model:value="state.loginform.crypto" placeholder="请输入验证码" />
                         </a-form-item>
                         <button class="cryptoword" @click="gerCryptoWord">{{ state.cryptoword }}</button>
@@ -165,6 +172,9 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="less">
+@mobile: ~"only screen and (max-width: 767px)";
+@tablet: ~"only screen and (min-width: 768px) and (max-width: 991px)";
+@desktop: ~"only screen and (min-width: 992px)";
 .loginform {
     width: 90vw;
     height: 85%;
@@ -172,6 +182,9 @@ onMounted(async () => {
     border-radius: 10px;
     padding: 5vh 3vw;
     margin: 0 auto;
+    @media @desktop {
+        width:60vw;
+    }
 }
 
 .loginform input {
@@ -211,11 +224,19 @@ onMounted(async () => {
 
 .crypto input {
     width: 30vw;
+    @media @desktop {
+        width:15vw;
+    }
+    
 }
 
 .crypto button {
     width: 40vw;
     height: 9vh;
+    @media @desktop {
+        width:20vw;
+    }
+
 }
 
 @keyframes crypto {

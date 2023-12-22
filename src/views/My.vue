@@ -10,7 +10,7 @@ const state=reactive({
     isAuth:false
 })
 onMounted(()=>{
-    state.isAuth = (userStore.userid != "");
+    state.isAuth = (userStore.userInfo.userid != "");
 })
 const goLogin=()=>{
     router.push("/login");

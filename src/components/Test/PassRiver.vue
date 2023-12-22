@@ -1,10 +1,11 @@
 <script setup lang="jsx">
-import { onMounted, onUnmounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref,inject, getCurrentInstance } from 'vue';
 import { message, notification } from "ant-design-vue"
 message.config({
     duration:3,
     top: '40vh'
 })
+const proxy=getCurrentInstance().proxy;
 const state = reactive({
     boatPosition: "boat",
     objectPosition: {
@@ -98,17 +99,18 @@ const passriver = () => {
             message.warning("羊吃掉了青菜，游戏失败！")
             clearInterval(timer);
         }
-
         //过河之后要进行成功检验
         const isSuccess = rightclass.includes("farmer") && rightclass.includes("sheep") && rightclass.includes("wolf") && rightclass.includes("vegetable")
         if (isSuccess) {
             message.success(`恭喜您游戏通关！用时${state.usedtime}秒！共走了${state.movesteps}步!`);
             clearInterval(timer);
+            proxy.$confetti.addConfetti();
         }
 
     }, 2200);
 
 }
+
 
 const onoffboard = (e) => {
     if(state.usedtime==0){

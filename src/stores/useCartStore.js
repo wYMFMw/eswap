@@ -26,7 +26,7 @@ export const useCartStore = defineStore('cart', () => {
     return priceList.reduce((sum,cur)=>sum+cur,0);
   })
   return {
-    cart: state.cart,
+    state,
     addToCart,
     removeFromCart,
     clearCart,

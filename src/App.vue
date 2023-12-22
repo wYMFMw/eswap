@@ -4,12 +4,10 @@ import Eswap from "@/components/Eswap.vue";
 import { doFileDownload } from "@/functions/file.js";
 import { doAliQuery } from "./functions/ai/ali";
 
-
 </script>
 
 <template>
     <Eswap/>
-   
 </template>
 
 <style scoped lang="less">

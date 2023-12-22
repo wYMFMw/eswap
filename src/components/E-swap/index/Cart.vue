@@ -12,7 +12,7 @@ onMounted(() => {
     getCartList();
 })
 const getCartList = () => {
-    cartStore.cart.map(item => {
+    cartStore.state.cart.map(item => {
         const listids = state.cartList.map(item3 => item3.id);
         if (!listids.includes(item.id)) {
             state.cartList.push({ ...item, count: 1 });
@@ -75,7 +75,7 @@ const goIndex = () => {
             <DeleteOutlined class="clearcart" @click="clearCart" />
         </div>
         <div class="items">
-            <a-empty v-if="cartStore.cart.length==0" class="emptyCart">
+            <a-empty v-if="cartStore.state.cart.length==0" class="emptyCart">
                 <template #description>
                     购物车空空如也，快去选购吧
                 </template>

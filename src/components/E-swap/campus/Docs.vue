@@ -77,7 +77,7 @@ const doSelect = async (menu) => {
         state.fileUrl = blobUrl;
     })
     state.isShowFile = true;
-    pageStore.pagename = "showFile";
+    pageStore.state.pagename = "showFile";
 
 }
 const closeFile = () => {

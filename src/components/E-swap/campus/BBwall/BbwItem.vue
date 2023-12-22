@@ -67,6 +67,9 @@ import { LikeOutlined, DislikeOutlined, MessageOutlined, ExportOutlined } from "
 </template>
 
 <style scoped lang="less">
+@mobile: ~"only screen and (max-width: 767px)";
+@tablet: ~"only screen and (min-width: 768px) and (max-width: 991px)";
+@desktop: ~"only screen and (min-width: 992px)";
 .trp{
     display: flex;
     justify-content: space-between;
@@ -118,7 +121,10 @@ import { LikeOutlined, DislikeOutlined, MessageOutlined, ExportOutlined } from "
 .media {
     img {
         border-radius: 0.4em;
-        width: 100%;
+        width: 50%;
+        @media @desktop {
+            width:40%;
+        }
     }
 }
 
@@ -131,4 +137,9 @@ import { LikeOutlined, DislikeOutlined, MessageOutlined, ExportOutlined } from "
     background-color: #ffffff;
     border-radius: 0.5em;
     margin-bottom: 1em;
+    @media @desktop {
+        display: inline-block;
+        width:45%;
+        margin:2.3vw;
+    }
 }</style>

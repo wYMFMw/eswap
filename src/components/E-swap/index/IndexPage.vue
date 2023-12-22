@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, reactive } from "vue";
+import { onMounted, ref, reactive, getCurrentInstance } from "vue";
 import IndexTopSearch from "./IndexTopSearch.vue";
 import WheelImgs from "./WheelImgs.vue";
 import Kingkong from "./Kingkong.vue";
@@ -7,14 +7,15 @@ import Capsule from "./Capsule.vue";
 import { CloseOutlined, AimOutlined } from "@ant-design/icons-vue"
 import { useCommodityStore } from "@/stores/useCommodityStore"
 import { doQuery } from "@/functions/mysql"
-import { useRouter } from "vue-router"
+import { useRouter,useRoute } from "vue-router"
 import Location from "./Location.vue";
 const router = useRouter()
+const route=useRoute();
 const commodityStore = useCommodityStore()
 
 const state = reactive({
     cimgs: [],
-    xcimgs:[],
+    xcimgs: [],
     showTags: false,
     xtags: ["乒乓球", "台球", "BJD娃娃", "垂钓", "今日降价", "民族乐器", "手风琴", "皮包", "汽车养护", "足球", "跑步装备", "穿搭", "电脑零件", "桌游", "电动车"],
     plustags: ["香水", "电子琴", "吉他", "健身", "汉服", "阅读", "配饰", "化妆品", "JK制服", "影音", "收纳", "Cosplay"]
@@ -39,15 +40,29 @@ const kkitems = [
 
 
 const hobbyitems = ["拉杆箱", "手机", "牛奶", "+"];
+const searchByCategory=async ()=>{
+    // if(route.query.category){
+    //     state.cimgs=commodityStore.state.allCommodity.filter(item=>item.category.includes(route.query.category));
+    // }
+}
+const getAllCommodity=async()=>{
+    let p={};
+    p.selectsql="select * from commodity2";
+    await doQuery(p).then(res=>{
+        commodityStore.state.allCommodity=res.data;
+        console.log(commodityStore.state.allCommodity);
+    })
+}
 onMounted(async () => {
     
-    if(commodityStore.state.commodityList.length==0){
+    if (commodityStore.state.commodityList.length == 0) {
         await getCommoditys();
-        state.xcimgs=state.cimgs;
-    }else{
-        state.cimgs=state.xcimgs=commodityStore.state.commodityList;
+        state.xcimgs = state.cimgs;
+        // await getAllCommodity();
+    } else {
+        state.cimgs = state.xcimgs = commodityStore.state.commodityList;
     }
-    
+    // await searchByCategory();
 })
 const getCommoditys = async () => {
     let p = {};
@@ -66,29 +81,29 @@ const getRandomColor = () => {
 const openTags = (item) => {
     if (item == "+") {
         state.showTags = true;
-    }else if(item==""){
-        state.cimgs=state.xcimgs;
-    }else{
-        state.cimgs=state.xcimgs.filter(xitem=>xitem.category==item);
+    } else if (item == "") {
+        state.cimgs = state.xcimgs;
+    } else {
+        state.cimgs = state.xcimgs.filter(xitem => xitem.category.includes(item));
     }
 }
-const guesslike=()=>{
-    state.cimgs=state.xcimgs;
+const guesslike = () => {
+    state.cimgs = state.xcimgs;
 }
-const deletexTag=(type,tag)=>{
-    if(type==1){
-        state.xtags=state.xtags.filter(item=>item!=tag);
-    }else if(type==2){
-        state.plustags=state.plustags.filter(item=>item!=tag);
+const deletexTag = (type, tag) => {
+    if (type == 1) {
+        state.xtags = state.xtags.filter(item => item != tag);
+    } else if (type == 2) {
+        state.plustags = state.plustags.filter(item => item != tag);
         state.xtags.push(tag);
     }
-    
+
 }
 </script>
 
 <template>
     <div class="indexpage">
-        <IndexTopSearch @do-search="openTags"/>
+        <IndexTopSearch @do-search="openTags" />
         <div class="scrollPart">
             <WheelImgs :imgs="imgs" />
             <Kingkong :items="kkitems" />
@@ -107,7 +122,7 @@ const deletexTag=(type,tag)=>{
                         <template #address>
                             浙江理工大学生活{{ (1 + Math.random() * 2).toFixed(0) }}区
                         </template>
-                        
+
                     </Location>
                     <div class="desc">
                         <a-tag v-if="(item.price) % 2 == 0" color="#2db7f5" class="tag">包邮</a-tag>
@@ -130,7 +145,7 @@ const deletexTag=(type,tag)=>{
     <a-drawer title="我的频道" class="tagDrawer" placement="bottom" height="90vh" :open="state.showTags"
         @close="state.showTags = false">
         <div class="xtagBody">
-            <div class="xtag" v-for="item of state.xtags" @click="deletexTag(1,item)">
+            <div class="xtag" v-for="item of state.xtags" @click="deletexTag(1, item)">
                 {{ item }}
                 <a-divider type="vertical" />
                 <CloseOutlined />
@@ -139,7 +154,7 @@ const deletexTag=(type,tag)=>{
         <a-tabs>
             <a-tab-pane key="x1" tab="为您推荐">
                 <div class="plustagBody">
-                    <div class="plustag" v-for="item of state.plustags"  @click="deletexTag(2,item)">
+                    <div class="plustag" v-for="item of state.plustags" @click="deletexTag(2, item)">
                         <CloseOutlined class="toplus" />
                         <a-divider type="vertical" />
                         {{ item }}
@@ -158,18 +173,25 @@ const deletexTag=(type,tag)=>{
 </template>
 
 <style scoped lang="less">
-.location{
+@mobile: ~"only screen and (max-width: 767px)";
+@tablet: ~"only screen and (min-width: 768px) and (max-width: 991px)";
+@desktop: ~"only screen and (min-width: 992px)";
+
+.location {
     position: relative;
-    top:-3vh;
+    top: -3vh;
 }
+
 .xtagBody {
     display: flex;
     flex-wrap: wrap;
-    padding:0.2em;
+    padding: 0.2em;
 }
-.plustagBody{
+
+.plustagBody {
     .xtagBody();
 }
+
 .toplus {
     transform: rotate(45deg);
 }
@@ -182,7 +204,7 @@ const deletexTag=(type,tag)=>{
     align-items: center;
     padding: 0.5em;
     border-radius: 0.6em;
-    margin:0 0.3em 0.8em;
+    margin: 0 0.3em 0.8em;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -255,18 +277,41 @@ const deletexTag=(type,tag)=>{
 }
 
 .card {
-    width: 45vw;
-    margin: 0.5em 0;
-    box-shadow: 0 0 0.5em #ddd;
-    border-radius: 0.5em;
-    overflow: hidden;
-    color: #000;
-    text-decoration: none;
+    .basecard{
+        margin: 0.5em 0;
+        box-shadow: 0 0 0.5em #ddd;
+        border-radius: 0.5em;
+        overflow: hidden;
+        color: #000;
+        text-decoration: none;
+    }
+    @media @desktop {
+        width: 18vw;
+        .basecard();
+    }
+
+    @media @mobile {
+        width: 45vw;
+        .basecard();
+    }
+    @media @tablet {
+        width:18vw;
+        .basecard();
+    }
+
 }
 
 .cimg img {
-    width: 42vw;
-    margin-left: 2vw;
+    @media @desktop {
+        width: 18vw;
+    }
+
+    @media @mobile {
+        width: 45vw;
+    }
+    @media @tablet {
+        width:18vw;
+    }
 }
 
 .desc {
@@ -296,5 +341,4 @@ const deletexTag=(type,tag)=>{
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-}
-</style>
+}</style>

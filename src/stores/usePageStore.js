@@ -6,6 +6,6 @@ export const usePageStore = defineStore('pageStore', () => {
     pagename:"登录页"
   })
   return {
-    pagename:state.pagename
+    state
   }
 })

@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, onMounted, getCurrentInstance } from "vue";
 import { message } from 'ant-design-vue';
 import { doQuery, doUpdate } from "@/functions/mysql";
 import Background from './Background.vue';
@@ -91,6 +91,10 @@ const doRegister = async () => {
             getUsers();
             clearRegisForm();
             message.success("亲爱的用户" + p.username + "恭喜您注册成功！");
+            router.push("/login");
+            setTimeout(() => {
+                proxy.$confetti.addConfetti();
+            }, 1000);
         })
     }
 }
@@ -109,7 +113,9 @@ const reGenerateInvCode = async () => {
         await doQuery(p2);//这里要用doQuery，因为doUpdate我是不支持无参数的
     }
 }
+const proxy=getCurrentInstance().proxy;
 onMounted(async () => {
+    
     await getUsers();
     await getInvCodes();
     await reGenerateInvCode();
@@ -146,6 +152,9 @@ onMounted(async () => {
     </div>
 </template>
 <style scoped lang="less">
+@mobile: ~"only screen and (max-width: 767px)";
+@tablet: ~"only screen and (min-width: 768px) and (max-width: 991px)";
+@desktop: ~"only screen and (min-width: 992px)";
 .register{
     width:100vw;
     height:88vh;
@@ -162,6 +171,9 @@ onMounted(async () => {
     padding: 1em;
     margin: 0 auto;
     /* overflow-y: scroll; */
+    @media @desktop {
+        width:60vw;
+    }
 
 }
 
@@ -173,6 +185,9 @@ onMounted(async () => {
     display: flex;
     justify-content: space-around;
     margin-top: 2vh;
+    @media @desktop {
+        margin-top:0;
+    }
 }
 
 .regisbtn {

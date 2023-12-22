@@ -4,14 +4,9 @@ import Kingkong from "../index/Kingkong.vue";
 import {reactive,computed} from "vue"
 import {useUserStore} from "@/stores/userStore";
 const userStore = useUserStore()
-const state=reactive({
-    userinfo:{
-        id:userStore.userid,
-        name:userStore.username
-    }
-})
+
 const memberid=computed(()=>{
-    const uid=state.userinfo.id;
+    const uid=userStore.userInfo.userid;
     const part1=uid[0];
     const part2=uid[uid.length-1];
     return  part1+"***"+part2;
@@ -55,7 +50,7 @@ const kingkong=[
             </div>
             <div class="names">
                 <div class="username">
-                    {{ state.userinfo.name }}
+                    {{ userStore.userInfo.username }}
                 </div>
                 <div class="membername">
                     会员名:{{ memberid}}
